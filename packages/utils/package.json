@@ -1,0 +1,17 @@
+{
+  "name": "@leaves/utils",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "typesVersions": {
+    "*": {
+      "*": [
+        "./src/*"
+      ]
+    }
+  },
+  "dependencies": {
+    "localforage": "^1.10.0"
+  }
+}

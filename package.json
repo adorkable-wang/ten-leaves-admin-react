@@ -15,6 +15,7 @@
     "ahooks": "^3.9.0",
     "antd": "^5.26.4",
     "classnames": "^2.5.1",
+    "@leaves/utils": "workspace:* ",
     "dayjs": "^1.11.13",
     "i18next": "^25.3.2",
     "react": "^18.3.1",
@@ -23,7 +24,7 @@
     "react-error-boundary": "^6.0.0",
     "react-i18next": "^15.6.0",
     "react-redux": "^9.2.0",
-    "react-router-dom": "^7.6.3"
+    "react-router-dom": "^6.27.0"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",
@@ -38,6 +39,7 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.20",
     "globals": "^16.3.0",
+    "lerna": "^8.2.3",
     "sass": "^1.89.2",
     "typescript": "~5.8.3",
     "typescript-eslint": "^8.35.1",
