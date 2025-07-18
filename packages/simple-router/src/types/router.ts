@@ -1,10 +1,17 @@
-import type { ElegantConstRoute } from '@ohh-889/react-auto-route';
 import type { Router as RemixRouter } from '@remix-run/router';
 import type { Location, RouteObject } from 'react-router-dom';
 
 import type { RouteRecordNormalized } from '../matcher/types';
 
 import type { Route, RouteLocationNormalizedLoaded } from './route';
+
+
+export type ElegantConstRoute = Omit<RouteObject, 'children' | 'id' | 'path'> & {
+    children?: ElegantConstRoute[];
+    matchedFiles: (string | null)[];
+    name: string;
+    path?: string | null;
+}
 
 export interface RouterGuard {
     afterEach?: (to: Route, from: Route | null) => void;

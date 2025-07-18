@@ -1,9 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-nocheck
-
-import type { ElegantConstRoute } from '@ohh-889/react-auto-route';
-
-import type { _RouteRecordBase } from '../types';
+import type { _RouteRecordBase, ElegantConstRoute } from '../types';
 
 export interface RouteRecordNormalized {
   /** Nested route records. */

@@ -1,9 +1,8 @@
-import type { ElegantConstRoute } from '@ohh-889/react-auto-route';
 import type { Location } from 'react-router-dom';
 import { matchPath } from 'react-router-dom';
 
 import { stringifyQuery } from '../query';
-import type { RouteLocationNamedRaw } from '../types';
+import type { ElegantConstRoute, RouteLocationNamedRaw } from '../types';
 import { transformLocationToFullPath } from '../utils/auxi';
 
 import { createRouteRecordMatcher } from './pathMatcher';

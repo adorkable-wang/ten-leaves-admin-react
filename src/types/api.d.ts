@@ -72,7 +72,7 @@ declare namespace Api {
    * backend api module: "route"
    */
   namespace Route {
-    type ElegantConstRoute = import('@elegant-router/types').ElegantConstRoute;
+    type ElegantConstRoute = import('@leaves/simple-route').ElegantConstRoute;
 
     interface MenuRoute extends ElegantConstRoute {
       id: string;
@@ -140,7 +140,7 @@ declare namespace Api {
     /** user search params */
     type UserSearchParams = CommonType.RecordNullable<
       Pick<Api.SystemManage.User, 'nickName' | 'status' | 'userEmail' | 'userGender' | 'userName' | 'userPhone'> &
-        CommonSearchParams
+      CommonSearchParams
     >;
 
     /** user list */
@@ -174,7 +174,7 @@ declare namespace Api {
     type IconType = '1' | '2';
 
     type MenuPropsOfRoute = Pick<
-      import('@ohh-889/react-auto-route').RouteMeta,
+      import('@leaves/simple-route').RouteMeta,
       | 'activeMenu'
       | 'constant'
       | 'fixedIndexInTab'

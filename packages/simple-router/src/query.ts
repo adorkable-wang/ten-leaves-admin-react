@@ -21,31 +21,33 @@ export type LocationQueryRaw = Record<string | number, LocationQueryValueRaw | L
 
 export const PLUS_RE = /\+/g; // %2B
 
-const EQUAL_RE = /[=]/g; // %3D
+export function decode(text: string | number): string {
+  try {
+    return decodeURIComponent(`${text}`);
+  } catch {
+    console.warn(`Error decoding "${text}". Using original value`);
+  }
+  return `${text}`;
+}
 
-const ENC_BRACKET_OPEN_RE = /%5B/g; // [
-const ENC_BRACKET_CLOSE_RE = /%5D/g; // ]
-const ENC_CARET_RE = /%5E/g; // ^
-const ENC_BACKTICK_RE = /%60/g; // `
-const ENC_CURLY_OPEN_RE = /%7B/g; // {
-const ENC_PIPE_RE = /%7C/g; // |
-const ENC_CURLY_CLOSE_RE = /%7D/g; // }
-const ENC_SPACE_RE = /%20/g; // }
-const HASH_RE = /#/g; // %23
-const AMPERSAND_RE = /&/g; // %26
 export function parseQuery(search: string): LocationQuery {
   const query: LocationQuery = {};
-  // avoid creating an object with an empty key and empty value
-  // because of split('&')
+  // 避免创建具有空键和空值的对象
+  // 因为 split('&')
   if (search === '' || search === '?') return query;
+
   const hasLeadingIM = search[0] === '?';
   const searchParams = (hasLeadingIM ? search.slice(1) : search).split('&');
 
   for (let i = 0; i < searchParams.length; i += 1) {
-    // pre decode the + into space
+    // 将所有的 + 替换为空格，因为 URL 查询参数中 + 代表空格。
     const searchParam = searchParams[i].replace(PLUS_RE, ' ');
-    // allow the = character
+
+    // 找出当前键值对字符串中第一个 = 号的位置，分隔键和值
     const eqPos = searchParam.indexOf('=');
+
+    // 如果没有 =，说明只有 key，没有 value，将整个字符串作为 key，value 为 null。
+    // 如果有 =，则：key 是 = 号之前的字符串，调用 decode 解码。value 是 = 号之后的字符串，也调用 decode 解码。
     const key = decode(eqPos < 0 ? searchParam : searchParam.slice(0, eqPos));
     const value = eqPos < 0 ? null : decode(searchParam.slice(eqPos + 1));
 
@@ -56,7 +58,7 @@ export function parseQuery(search: string): LocationQuery {
         currentValue = [currentValue];
         query[key] = currentValue;
       }
-      // we force the modification
+      // 强制修改
       (currentValue as LocationQueryValue[]).push(value);
     } else {
       query[key] = value;
@@ -65,68 +67,3 @@ export function parseQuery(search: string): LocationQuery {
   return query;
 }
 
-export function stringifyQuery(query: LocationQueryRaw): string {
-  let search = '';
-
-  for (const [originalKey, value] of Object.entries(query)) {
-    const key = encodeQueryKey(originalKey);
-    if (value === null) {
-      // only null adds the value
-      if (value !== undefined) {
-        search += (search.length ? '&' : '') + key;
-      }
-      // eslint-disable-next-line no-continue
-      continue;
-    }
-    // keep null values
-    const values: LocationQueryValueRaw[] = Array.isArray(value)
-      ? value.map(v => v && encodeQueryValue(v))
-      : [value && encodeQueryValue(value)];
-
-    for (const v of values) {
-      // skip undefined values in arrays as if they were not present
-      if (v !== undefined) {
-        // only append & with non-empty search
-        search += (search.length ? '&' : '') + key;
-        if (v !== null) search += `=${v}`;
-      }
-    }
-  }
-
-  return search;
-}
-
-export function decode(text: string | number): string {
-  try {
-    return decodeURIComponent(`${text}`);
-  } catch {
-    console.warn(`Error decoding "${text}". Using original value`);
-  }
-  return `${text}`;
-}
-
-export function encodeQueryKey(text: string | number): string {
-  return encodeQueryValue(text).replace(EQUAL_RE, '%3D');
-}
-
-export function encodeQueryValue(text: string | number): string {
-  return (
-    commonEncode(text)
-      // Encode the space as +, encode the + to differentiate it from the space
-      .replace(PLUS_RE, '%2B')
-      .replace(ENC_SPACE_RE, '+')
-      .replace(HASH_RE, '%23')
-      .replace(AMPERSAND_RE, '%26')
-      .replace(ENC_BACKTICK_RE, '`')
-      .replace(ENC_CURLY_OPEN_RE, '{')
-      .replace(ENC_CURLY_CLOSE_RE, '}')
-      .replace(ENC_CARET_RE, '^')
-  );
-}
-
-function commonEncode(text: string | number): string {
-  return encodeURI(`${text}`)
-    .replace(ENC_PIPE_RE, '|')
-    .replace(ENC_BRACKET_OPEN_RE, '[')
-    .replace(ENC_BRACKET_CLOSE_RE, ']');
-}
