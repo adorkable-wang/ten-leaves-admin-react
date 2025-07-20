@@ -1,7 +1,8 @@
-import { ConfigProvider } from "antd";
-import AppProvider from "./components/stateful/AppProvider";
-import { HashRouter, Outlet, Route, Routes } from "react-router-dom";
-import { ROUTES } from "./router/routes";
+import { ConfigProvider } from 'antd';
+import { HashRouter, Outlet, Route, Routes } from 'react-router-dom';
+
+import AppProvider from './components/stateful/AppProvider';
+import { ROUTES } from './router/routes';
 
 // const Layout = () => {
 //   return (

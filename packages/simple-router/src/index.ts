@@ -3,7 +3,6 @@ import { useRoute } from './hooks/useRoute';
 import { useRouter } from './hooks/useRouter';
 import type { RouteRecordNormalized } from './matcher/types';
 
-
 export type { Mode, Options, Router, RouterOptions } from './router';
 
 export * from './types';

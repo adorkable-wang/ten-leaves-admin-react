@@ -62,7 +62,7 @@ importers:
         version: 9.31.0
       '@soybeanjs/eslint-config':
         specifier: ^1.7.1
-        version: 1.7.1(@typescript-eslint/utils@8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(eslint-plugin-react-hooks@5.2.0(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react-refresh@0.4.20(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react@7.37.5(eslint@9.31.0(jiti@2.4.2)))(eslint@9.31.0(jiti@2.4.2))(svelte-eslint-parser@1.3.0)(typescript@5.8.3)
+        version: 1.7.1(@typescript-eslint/utils@8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(@unocss/eslint-config@66.3.3(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(eslint-plugin-react-hooks@5.2.0(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react-refresh@0.4.20(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react@7.37.5(eslint@9.31.0(jiti@2.4.2)))(eslint@9.31.0(jiti@2.4.2))(svelte-eslint-parser@1.3.0)(typescript@5.8.3)
       '@types/node':
         specifier: ^24.0.14
         version: 24.0.14
@@ -78,6 +78,9 @@ importers:
       '@typescript-eslint/parser':
         specifier: ^8.37.0
         version: 8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
+      '@unocss/eslint-config':
+        specifier: ^66.3.3
+        version: 66.3.3(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
       '@unocss/preset-wind3':
         specifier: ^66.3.3
         version: 66.3.3
@@ -94,7 +97,7 @@ importers:
         specifier: ^3.10.2
         version: 3.10.2(vite@7.0.4(@types/node@24.0.14)(jiti@2.4.2)(sass@1.89.2)(yaml@2.8.0))
       eslint:
-        specifier: ^9.30.1
+        specifier: ^9.31.0
         version: 9.31.0(jiti@2.4.2)
       eslint-plugin-react:
         specifier: ^7.37.5
@@ -1395,6 +1398,14 @@ packages:
 
   '@unocss/core@66.3.3':
     resolution: {integrity: sha512-6WFLd92TJelVQARtCGaF+EgEoHKIVe43gkGXVoWILu0HUDRWdhv+cpcyX0RTJV22Y976AxeneU7/zmhAh+CXNg==}
+
+  '@unocss/eslint-config@66.3.3':
+    resolution: {integrity: sha512-gNTBP+GX6OsUSfQgvheuW6fetxLg9tn+7rTDqpxld5WqBPiutXo/adjcZ127kSTNMz4FF6hlsz5bkYyfsMuGaQ==}
+    engines: {node: '>=14'}
+
+  '@unocss/eslint-plugin@66.3.3':
+    resolution: {integrity: sha512-n2Jd22Z5QEAAdXPBzq5i4L8gzYLy7vMF/2N8TE7b8GdIF9kuawyYxTmcjgg+Tp/Sr1HXp/Fcs7Oic2lv5ZvU+A==}
+    engines: {node: '>=14'}
 
   '@unocss/extractor-arbitrary-variants@66.3.3':
     resolution: {integrity: sha512-TXzjH6FcITQ8V2x7ETHgVOlAHf3ll/ysxL+W4fMROm8jP/o7jvsg36tRfOwU0sDGo/qoCPux82ix9e6/JW0oqQ==}
@@ -5793,7 +5804,7 @@ snapshots:
 
   '@sinclair/typebox@0.27.8': {}
 
-  '@soybeanjs/eslint-config@1.7.1(@typescript-eslint/utils@8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(eslint-plugin-react-hooks@5.2.0(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react-refresh@0.4.20(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react@7.37.5(eslint@9.31.0(jiti@2.4.2)))(eslint@9.31.0(jiti@2.4.2))(svelte-eslint-parser@1.3.0)(typescript@5.8.3)':
+  '@soybeanjs/eslint-config@1.7.1(@typescript-eslint/utils@8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(@unocss/eslint-config@66.3.3(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3))(eslint-plugin-react-hooks@5.2.0(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react-refresh@0.4.20(eslint@9.31.0(jiti@2.4.2)))(eslint-plugin-react@7.37.5(eslint@9.31.0(jiti@2.4.2)))(eslint@9.31.0(jiti@2.4.2))(svelte-eslint-parser@1.3.0)(typescript@5.8.3)':
     dependencies:
       '@antfu/eslint-define-config': 1.23.0-2
       '@antfu/install-pkg': 1.1.0
@@ -5817,6 +5828,7 @@ snapshots:
       svelte-eslint-parser: 1.3.0
       typescript: 5.8.3
     optionalDependencies:
+      '@unocss/eslint-config': 66.3.3(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
       eslint-plugin-react: 7.37.5(eslint@9.31.0(jiti@2.4.2))
       eslint-plugin-react-hooks: 5.2.0(eslint@9.31.0(jiti@2.4.2))
       eslint-plugin-react-refresh: 0.4.20(eslint@9.31.0(jiti@2.4.2))
@@ -6234,6 +6246,27 @@ snapshots:
       unconfig: 7.3.2
 
   '@unocss/core@66.3.3': {}
+
+  '@unocss/eslint-config@66.3.3(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)':
+    dependencies:
+      '@unocss/eslint-plugin': 66.3.3(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
+    transitivePeerDependencies:
+      - eslint
+      - supports-color
+      - typescript
+
+  '@unocss/eslint-plugin@66.3.3(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)':
+    dependencies:
+      '@typescript-eslint/utils': 8.37.0(eslint@9.31.0(jiti@2.4.2))(typescript@5.8.3)
+      '@unocss/config': 66.3.3
+      '@unocss/core': 66.3.3
+      '@unocss/rule-utils': 66.3.3
+      magic-string: 0.30.17
+      synckit: 0.11.8
+    transitivePeerDependencies:
+      - eslint
+      - supports-color
+      - typescript
 
   '@unocss/extractor-arbitrary-variants@66.3.3':
     dependencies:

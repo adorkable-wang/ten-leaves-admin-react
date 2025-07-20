@@ -1,21 +1,19 @@
-import type { Location } from 'react-router-dom';
-import { matchPath } from 'react-router-dom';
+import { stringify } from 'node:querystring';
 
-import { stringifyQuery } from '../query';
 import type { ElegantConstRoute, RouteLocationNamedRaw } from '../types';
-import { transformLocationToFullPath } from '../utils/auxi';
 
 import { createRouteRecordMatcher } from './pathMatcher';
-import {
-  checkChildMissingNameWithEmptyPath,
-  cleanParams,
-  generatePath,
-  getQueryParams,
-  mergeMetaFields,
-  normalizeRouteRecord
-} from './shared';
+import { checkChildMissingNameWithEmptyPath, cleanParams, generatePath, normalizeRouteRecord } from './shared';
 import type { RouteRecordRaw } from './types';
 
+/**
+ * 支持自动化、常量化的路由匹配器
+ * 支持根据 name 快速解析路径
+ * 支持动态添加和删除路由
+ * 可以解析完整的路径、params、query 等信息
+ *
+ * @class CreateRouterMatcher
+ */
 class CreateRouterMatcher {
   // Internal routes maintained for react-router
   matchers: RouteRecordRaw[] = [];
@@ -33,50 +31,48 @@ class CreateRouterMatcher {
     this.removeRoute = this.removeRoute.bind(this);
   }
 
-  /** - Initializes the routes by adding each route from the initial routes array. */
+  /** - 通过添加路由数组中的每条数组进行初始化 */
   initializeRoutes() {
     this.initRoutes.forEach(route => this.addRoute(route));
   }
 
   /**
-   * -Removes a route from the matcherMap by its name.
+   * 添加路由记录
    *
-   * @param name - The name of the route to remove.
+   * @param {ElegantConstRoute} record 需要添加的路由记录
+   * @param {RouteRecordRaw} [parent] 父路由 matcher 用于拼接嵌套路由
+   * @param {RouteRecordRaw} [originalRecord] 原始顶层路由，用于识别是否第一次添加
+   * @memberof CreateRouterMatcher
    */
-  removeMatcherMapByName(name: string) {
-    this.matcherMap.delete(name);
-  }
-
   addRoute(record: ElegantConstRoute, parent?: RouteRecordRaw, originalRecord?: RouteRecordRaw) {
-    // used later on to remove by name
     const isRootAdd = !originalRecord;
 
     const mainNormalizedRecord = normalizeRouteRecord(record);
+
     if (import.meta.env.NODE_ENV === 'development') {
       checkChildMissingNameWithEmptyPath(mainNormalizedRecord, parent);
     }
 
-    // generate an array of records to correctly handle aliases
+    // 生成一个记录数组来正确处理 aliases(别名) 路由
     const normalizedRecords: (typeof mainNormalizedRecord)[] = [mainNormalizedRecord];
 
     let matcher: RouteRecordRaw;
 
     for (const normalizedRecord of normalizedRecords) {
       const { path } = normalizedRecord;
-      // Build up the path for nested routes if the child isn't an absolute
-      // route. Only add the / delimiter if the child path isn't empty and if the
-      // parent path doesn't have a trailing slash
+
+      // 如果有父路由且子路由不是绝对路径，则构建嵌套路由的路径。仅当子路径不为空且父路径末尾没有斜杠时，才添加 / 分隔符。
       if (parent && path && path[0] !== '/') {
-        const parentPath = parent.record.path as string;
+        const parentPath = parent.record.path;
         const connectingSlash = parentPath[parentPath.length - 1] === '/' ? '' : '/';
         normalizedRecord.path = parent.record.path + (path && connectingSlash + path);
       }
 
-      // create the object beforehand, so it can be passed to children
+      // 构建一个 matcher 对象（路径解析器 + 路由配置）
+      // 会把 normalizedRecord + parent 的信息整合成一个完整的 matcher 节点
       matcher = createRouteRecordMatcher(normalizedRecord, parent);
 
-      // remove the route if named and only for the top record (avoid in nested calls)
-      // this works because the original record is the first one
+      // 删除之前同名路由，并且仅针对顶部记录（避免嵌套调用）这是有效的，因为原始记录是第一个
       if (isRootAdd && record.name) {
         this.removeRoute(record.name);
       }
@@ -90,9 +86,6 @@ class CreateRouterMatcher {
         }
       }
 
-      // Avoid adding a record that doesn't display anything. This allows passing through records without a component to
-      // not be reached and pass through the catch all route
-
       if (matcher.record.name) {
         this.insertMatcher(matcher);
       }
@@ -100,16 +93,111 @@ class CreateRouterMatcher {
   }
 
   /**
-   * Removes a route from the matchers and matcherMap. If the route has children, it recursively removes them as well.
+   * 将新的 matcher 插入到 matcher数组和 matcher 映射中
    *
-   * @param matcherRef - The route reference, which can be a name or a matcher object.
+   * @param {RouteRecordRaw} matcher
+   * @memberof CreateRouterMatcher
+   */
+  insertMatcher(matcher: RouteRecordRaw) {
+    if (matcher.record.path === '*') {
+      this.matchers.unshift(matcher);
+    } else {
+      this.matchers.push(matcher);
+    }
+
+    // 只将原始记录添加到名称映射中
+    if (matcher.record.name) this.matcherMap.set(matcher.record.name, matcher);
+  }
+
+  /**
+   * 解析路由匹配器,将用户输入的路由信息（如 name, path, query 等）标准化解析成一个完整的路由对象，供实际跳转或匹配使用。
+   *
+   * @param {(RouteLocationNamedRaw | Location)} location 即将跳转的目标路由
+   * @param {RouteLocationNamedRaw} currentLocation 当前路由
+   * @memberof CreateRouterMatcher
+   */
+  resolve(location: RouteLocationNamedRaw | Location, currentLocation: RouteLocationNamedRaw) {
+    let matcher: RouteRecordRaw | undefined;
+    const query: Record<string, string> = {};
+    const path: string = '';
+    let name: string | undefined;
+    let params: Record<string, any> = {};
+    let fullPath: string = '';
+
+    // 基于 name 跳转
+    if ('name' in location) {
+      matcher = this.matcherMap.get(location.name);
+      if (!matcher) matcher = this.matchers[0]; // 默认使用第一个 matcher
+
+      name = matcher.record.name;
+      params = cleanParams(location.params || {});
+      fullPath = generatePath(matcher.record.path, params);
+
+      query = location.query || {};
+      const queryParams = stringifyQuery(query);
+    }
+
+    return {
+      fullPath,
+      name,
+      params,
+      path,
+      query
+    };
+  }
+
+  /**
+   * 获取指定名称的路由匹配器
+   *
+   * @param {string} name
+   * @return {*}
+   * @memberof CreateRouterMatcher
+   */
+  getRecordMatcher(name: string) {
+    return this.matcherMap.get(name);
+  }
+
+  /**
+   * 获取所有路由匹配器
+   *
+   * @return {*}
+   * @memberof CreateRouterMatcher
+   */
+  getRoutes() {
+    return this.matchers;
+  }
+
+  /**
+   * 获取所有路由名称
+   *
+   * @return {*}
+   * @memberof CreateRouterMatcher
+   */
+  getAllRouteNames() {
+    return Array.from(this.matcherMap.keys());
+  }
+
+  /**
+   * 根据名称从 matcherMap 中删除路由。
+   *
+   * @param name - The name of the route to remove.
+   */
+  removeMatcherMapByName(name: string) {
+    this.matcherMap.delete(name);
+  }
+
+  /**
+   *  从路由匹配器中删除指定的路由。
+   *
+   * @param {(string | RouteRecordRaw)} matcherRef 路由的引用，可以是名称或者 matcher 对象
+   * @memberof CreateRouterMatcher
    */
   removeRoute(matcherRef: string | RouteRecordRaw) {
     const matcher = typeof matcherRef === 'string' ? this.matcherMap.get(matcherRef) : matcherRef;
 
     if (!matcher) return;
 
-    // Recursively remove children
+    // 递归删除子项
     matcher.children.forEach(child => this.removeRoute(child));
 
     const index = this.matchers.indexOf(matcher);
@@ -123,137 +211,11 @@ class CreateRouterMatcher {
   }
 
   /**
-   * Gets a matcher object by its name.
+   * 重置路由匹配器，清空所有匹配器和映射，并重新初始化路由。
    *
-   * @param name - The name of the route to get.
-   * @returns The matcher object corresponding to the name, or undefined if not found.
+   * @memberof CreateRouterMatcher
    */
-  getRecordMatcher(name: string) {
-    return this.matcherMap.get(name);
-  }
-
-  resolve(location: RouteLocationNamedRaw | Location, currentLocation: RouteLocationNamedRaw) {
-    let matcher: RouteRecordRaw | undefined;
-    let query: Record<string, any> = {};
-    let path: string = '';
-    let name: string | undefined;
-    let params: Record<string, any> = {};
-    let fullPath: string = '';
-
-    if ('name' in location) {
-      matcher = this.matcherMap.get(location.name);
-
-      if (!matcher) {
-        matcher = this.matchers[0];
-      }
-
-      name = matcher.record.name;
-      params = cleanParams(location.params || {});
-      fullPath = generatePath(matcher.record.path, params);
-
-      query = location.query || {};
-      const queryParams = stringifyQuery(query);
-
-      fullPath += queryParams ? `?${queryParams}` : '';
-
-      path = matcher.record.path;
-
-      if (location.hash) {
-        fullPath += location.hash;
-      }
-    } else if (location.pathname) {
-      // no need to resolve the path with the matcher as it was provided
-      // this also allows the user to control the encoding
-      path = this.basename === '/' ? location.pathname : location.pathname.replace(this.basename, '');
-
-      matcher = this.matchers.slice(1).find(m => matchPath(m.record.path, path)) || this.matchers[0];
-      if (!matcher) matcher = this.matchers[0];
-
-      // matcher should have a value after the loop
-      query = getQueryParams(location.search);
-
-      if (matcher) {
-        const match = matchPath(matcher.record.path, path);
-        if (match?.params) {
-          params = match.params; // 如果有 params 则赋值
-        }
-        name = matcher.record.name;
-
-        fullPath =
-          this.basename === '/'
-            ? transformLocationToFullPath(location)
-            : transformLocationToFullPath(location).replace(this.basename, '');
-      }
-      // location is a relative path
-    } else {
-      // match by name or path of current route
-      matcher = currentLocation.name
-        ? this.matcherMap.get(currentLocation.name)
-        : this.matchers.find(m => m.record === (currentLocation.path as unknown));
-      if (!matcher) {
-        throw new Error('there is no such route');
-      }
-
-      name = matcher.record.name;
-    }
-    const matched = [];
-    let parentMatcher: RouteRecordRaw | undefined = matcher;
-    while (parentMatcher) {
-      // reversed order so parents are at the beginning
-      matched.unshift(parentMatcher.record);
-      parentMatcher = parentMatcher.parent;
-    }
-
-    return {
-      fullPath,
-      hash: location.hash,
-      matched,
-      meta: mergeMetaFields(matched),
-      name,
-      params,
-      path,
-      query,
-      redirect: matcher.record.redirect,
-      state: location?.state || null
-    };
-  }
-
-  /**
-   * Gets all the route names currently in the matcherMap.
-   *
-   * @returns An array of route names.
-   */
-  getAllRouteNames() {
-    return Array.from(this.matcherMap.keys());
-  }
-
-  /**
-   * Inserts a new matcher into the matchers array and matcherMap.
-   *
-   * @param matcher - The matcher object to insert.
-   */
-  insertMatcher(matcher: RouteRecordRaw) {
-    if (matcher.record.path === '*') {
-      this.matchers.unshift(matcher);
-    } else {
-      this.matchers.push(matcher);
-    }
-
-    // only add the original record to the name map
-    if (matcher.record.name) this.matcherMap.set(matcher.record.name, matcher);
-  }
-
-  /**
-   * Gets all the routes currently in the matchers array.
-   *
-   * @returns An array of matcher objects.
-   */
-  getRoutes() {
-    return this.matchers;
-  }
-
-  /** - Resets the matchers array and matcherMap, then re-initializes the routes. */
-  resetMatcher() {
+  resetMatchers() {
     this.matchers.length = 0;
     this.matcherMap.clear();
     this.initializeRoutes();

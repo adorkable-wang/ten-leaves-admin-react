@@ -1,7 +1,7 @@
-import type { FC, ReactNode } from "react";
+import type { FC, ReactNode } from 'react';
 
 interface Props {
-  children: ReactNode;
+  readonly children: ReactNode;
 }
 
 const MenuProvider: FC<Props> = ({ children }) => {

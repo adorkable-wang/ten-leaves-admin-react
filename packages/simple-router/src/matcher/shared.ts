@@ -18,7 +18,17 @@ export function objectToQueryParams(params: { [key: string]: string | number }):
   return queryParams.toString();
 }
 
+/**
+ * 将带有动态参数的路径模板转换为实际路径
+ *  '/user/:id/profile' + { id: 123 } → '/user/123/profile'
+ *
+ * @export
+ * @param {string} pathTemplate
+ * @param {({ [key: string]: string | number })} params
+ * @return {*}  {string}
+ */
 export function generatePath(pathTemplate: string, params: { [key: string]: string | number }): string {
+  // 正则匹配识别并替换 :param 字段,并查找对应值，找不到则发出警告
   let path = pathTemplate.replace(/:([a-zA-Z]+)/g, (_, p1) => {
     if (p1 in params) {
       return params[p1].toString();
@@ -39,11 +49,20 @@ export function generatePath(pathTemplate: string, params: { [key: string]: stri
   return path;
 }
 
+/**
+ * 标准化路由转换
+ *
+ * @export
+ * @param {ElegantConstRoute} record
+ * @return {*}  {RouteRecordNormalized}
+ */
 export function normalizeRouteRecord(record: ElegantConstRoute): RouteRecordNormalized {
   return {
     children:
       record.children?.map(child => {
-        child.redirect ||= child.children && child.children[0].path;
+        if (!child.redirect && child.children) {
+          child.redirect = child.children[0].path;
+        }
         return child;
       }) || [],
     meta: record.meta || {},
@@ -54,7 +73,7 @@ export function normalizeRouteRecord(record: ElegantConstRoute): RouteRecordNorm
 }
 
 /**
- * A route with a name and a child with an empty path without a name should warn when adding the route
+ * 具有名称的路由和具有空路径且没有名称的子路由在添加路线时应发出警告
  *
  * @param mainNormalizedRecord - RouteRecordNormalized
  * @param parent - RouteRecordMatcher
@@ -62,9 +81,9 @@ export function normalizeRouteRecord(record: ElegantConstRoute): RouteRecordNorm
 export function checkChildMissingNameWithEmptyPath(mainNormalizedRecord: RouteRecordNormalized, parent?: any) {
   if (parent && parent.record.name && !mainNormalizedRecord.name && !mainNormalizedRecord.path) {
     warn(
-      `The route named "${String(
+      `路由 "${String(
         parent.record.name
-      )}" has a child without a name and an empty path. Using that name won't render the empty path child so you probably want to move the name to the child instead. If this is intentional, add a name to the child route to remove the warning.`
+      )}" 的子路由没有名称且路径为空。使用该名称将不会渲染空路径子路由，因此您可能希望将名称移动到子路由中。如果这是故意的，请为子路由添加名称以消除警告。`
     );
   }
 }
@@ -83,7 +102,7 @@ export function mergeMetaFields(matched: RouteRecordNormalized[]) {
 }
 
 /**
- * Cleans and filters out null/undefined parameters.
+ * 清理并过滤掉空/未定义的参数,并将数组参数转换为逗号分隔的字符串
  *
  * @param params - The raw parameters.
  * @returns The cleaned parameters.

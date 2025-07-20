@@ -5,66 +5,65 @@ import type { RouteRecordNormalized } from '../matcher/types';
 
 import type { Route, RouteLocationNormalizedLoaded } from './route';
 
-
 export type ElegantConstRoute = Omit<RouteObject, 'children' | 'id' | 'path'> & {
-    children?: ElegantConstRoute[];
-    matchedFiles: (string | null)[];
-    name: string;
-    path?: string | null;
-}
+  children?: ElegantConstRoute[];
+  matchedFiles: (string | null)[];
+  name: string;
+  path?: string | null;
+};
 
 export interface RouterGuard {
-    afterEach?: (to: Route, from: Route | null) => void;
-    beforeEach?: (to: Route, from: Route | null) => boolean | Promise<boolean>;
+  afterEach?: (to: Route, from: Route | null) => void;
+  beforeEach?: (to: Route, from: Route | null) => boolean | Promise<boolean>;
 }
 
 export interface RouteParams {
-    [key: string]: string;
+  [key: string]: string;
 }
 
 export interface RouteLocation {
-    params: RouteParams;
-    path: string;
-    query: Record<string, string>;
+  params: RouteParams;
+  path: string;
+  query: Record<string, string>;
 }
 
 export interface RouterOptions {
-    afterEach: AfterEach;
-    basename: string;
-    beforeEach: BeforeEach;
-    firstInit: (allNames: string[]) => void;
-    getReactRoutes(route: ElegantConstRoute): RouteObject;
-    history: 'hash' | 'history' | 'memory';
-    init(reactRouter: RemixRouter): Promise<void>;
-    initRoutes: ElegantConstRoute[];
+  afterEach: AfterEach;
+  basename: string;
+  beforeEach: BeforeEach;
+  firstInit: (allNames: string[]) => void;
+  getReactRoutes(route: ElegantConstRoute): RouteObject;
+  history: 'hash' | 'history' | 'memory';
+  init(reactRouter: RemixRouter): Promise<void>;
+  initRoutes: ElegantConstRoute[];
 }
 
 /** Router instance. */
 export interface Router {
-    addReactRoutes: (routes: ElegantConstRoute[]) => void;
-    back: () => void;
-    readonly currentRoute: RouteLocationNormalizedLoaded;
-    CustomRouterProvider: (loading: React.ReactNode) => JSX.Element;
-    forwardRef: () => void;
-    getAllRouteNames: () => string[];
-    getRouteByName: (name: string) => RouteRecordNormalized | undefined;
-    getRoutes: () => RouteRecordNormalized[];
-    go: (delta: number) => void;
-    push: (to: RouteLocationNamedRaw) => void;
-    readonly reactRouter: RemixRouter;
-    readonly reactRoutes: RouteObject[];
-    removeRoute: (name: string) => void;
-    resetRoute: () => void;
+  addReactRoutes: (routes: ElegantConstRoute[]) => void;
+  back: () => void;
+  readonly currentRoute: RouteLocationNormalizedLoaded;
+  CustomRouterProvider: (loading: React.ReactNode) => JSX.Element;
+  forwardRef: () => void;
+  getAllRouteNames: () => string[];
+  getRouteByName: (name: string) => RouteRecordNormalized | undefined;
+  getRoutes: () => RouteRecordNormalized[];
+  go: (delta: number) => void;
+  push: (to: RouteLocationNamedRaw) => void;
+  readonly reactRouter: RemixRouter;
+  readonly reactRoutes: RouteObject[];
+  removeRoute: (name: string) => void;
+  resetRoute: () => void;
 }
 
 export type NavigationGuardNext = (
-    param?: boolean | undefined | null | string | Location | RouteLocationNamedRaw
+  param?: boolean | undefined | null | string | Location | RouteLocationNamedRaw
 ) => boolean;
 
 export type BeforeEach = (
-    to: RouteLocationNormalizedLoaded,
-    from: RouteLocationNormalizedLoaded,
-    blockerOrJump: NavigationGuardNext
+  to: RouteLocationNormalizedLoaded,
+  from: RouteLocationNormalizedLoaded,
+  blockerOrJump: NavigationGuardNext
 ) => boolean;
 
 export type AfterEach = (to: RouteLocationNormalizedLoaded, from: RouteLocationNormalizedLoaded) => void;
@@ -74,19 +73,19 @@ export type HistoryStateArray = Array<HistoryStateValue>;
 export type HistoryStateValue = string | number | boolean | null | undefined | HistoryState | HistoryStateArray;
 
 export interface HistoryState {
-    [x: number]: HistoryStateValue;
-    [x: string]: HistoryStateValue;
+  [x: number]: HistoryStateValue;
+  [x: string]: HistoryStateValue;
 }
 
 export interface RouteLocationOptions {
-    /** Replace the entry in the history instead of pushing a new entry */
-    replace?: boolean;
+  /** Replace the entry in the history instead of pushing a new entry */
+  replace?: boolean;
 
-    /**
-     * State to save using the History API. This cannot contain any reactive values and some primitives like Symbols are
-     * forbidden. More info at https://developer.mozilla.org/en-US/docs/Web/API/History/state
-     */
-    state?: HistoryState;
+  /**
+   * State to save using the History API. This cannot contain any reactive values and some primitives like Symbols are
+   * forbidden. More info at https://developer.mozilla.org/en-US/docs/Web/API/History/state
+   */
+  state?: HistoryState;
 }
 
 /**
@@ -125,17 +124,17 @@ export type LocationQuery = Record<string, LocationQueryValue | LocationQueryVal
 export type RouteParamsRaw = Record<string, RouteParamValueRaw | Exclude<RouteParamValueRaw, null | undefined>[]>;
 
 export interface LocationAsRelativeRaw {
-    name: string;
-    params?: RouteParamsRaw;
-    path?: string;
+  name: string;
+  params?: RouteParamsRaw;
+  path?: string;
 }
 
 export type LocationQueryRaw = Record<string | number, LocationQueryValueRaw | LocationQueryValueRaw[]>;
 
 /** @internal */
 export interface RouteQueryAndHash {
-    hash?: string;
-    query?: LocationQueryRaw;
+  hash?: string;
+  query?: LocationQueryRaw;
 }
 
 /**
@@ -143,11 +142,11 @@ export interface RouteQueryAndHash {
  *
  * @internal
  */
-export interface RouteLocationNamedRaw extends RouteQueryAndHash, LocationAsRelativeRaw, RouteLocationOptions { }
+export interface RouteLocationNamedRaw extends RouteQueryAndHash, LocationAsRelativeRaw, RouteLocationOptions {}
 
 type PatchRoutesParams = Parameters<RemixRouter['patchRoutes']>;
 
 export type Init = (
-    currentFullPath: string,
-    patchRoutes?: (parentId: PatchRoutesParams[0], routes: PatchRoutesParams[1]) => void
+  currentFullPath: string,
+  patchRoutes?: (parentId: PatchRoutesParams[0], routes: PatchRoutesParams[1]) => void
 ) => Promise<RouteLocationNamedRaw | null | string>;

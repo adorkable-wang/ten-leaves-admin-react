@@ -1,87 +1,87 @@
 export const ROUTES = {
-  Root: '/',
-  Login: '/login',
-  Home: {
-    Root: '/home',
-  },
-  Work: {
-    Root: '/work',
-    Filmography: {
-      Root: '/work/filmography',
-      AddEdit: '/work/filmography/addEdit/:id',
-      Detail: '/work/filmography/detail/:id',
-    },
-    Literature: {
-      Root: '/work/literature',
-      AddEdit: '/work/literature/addEdit/:id',
-      Detail: '/work/literature/detail/:id',
-    },
-  },
   Contract: {
-    Root: '/contract',
     IPContracts: {
-      Root: '/contract/ipContracts',
       AddEdit: '/contract/ipContracts/addEdit/:id/:status',
       Detail: '/contract/ipContracts/detail/:id/:detailType',
-      Supplemental: '/contract/ipContracts/supplemental/:id',
+      Root: '/contract/ipContracts',
+      Supplemental: '/contract/ipContracts/supplemental/:id'
     },
     IssuanceContract: {
-      Root: '/contract/issuanceContract',
       AddEdit: '/contract/issuanceContract/addEdit/:id/:status',
       Detail: '/contract/issuanceContract/detail/:id/:detailType',
-      Supplemental: '/contract/issuanceContract/supplemental/:id',
+      Root: '/contract/issuanceContract',
+      Supplemental: '/contract/issuanceContract/supplemental/:id'
     },
+    Root: '/contract',
     WarehouseContracts: {
-      CustomizedContract: {
-        Root: '/contract/customizedContract',
-        AddEdit: '/contract/customizedContract/addEdit/:id/:status',
-        Detail: '/contract/customizedContract/detail/:id/:detailType',
-        Supplemental: '/contract/customizedContract/supplemental/:id',
-      },
-      JointInvestmentContract: {
-        Root: '/contract/jointInvestmentContract',
-        AddEdit: '/contract/jointInvestmentContract/addEdit/:id/:status',
-        Detail: '/contract/jointInvestmentContract/detail/:id/:detailType',
-        Supplemental: '/contract/jointInvestmentContract/supplemental/:id',
-      },
-      CoProductionContract: {
-        Root: '/contract/coProductionContract',
-        AddEdit: '/contract/coProductionContract/addEdit/:id/:status',
-        Detail: '/contract/coProductionContract/detail/:id/:detailType',
-        Supplemental: '/contract/coProductionContract/supplemental/:id',
-      },
-      PurchaseContract: {
-        Root: '/contract/purchaseContract',
-        AddEdit: '/contract/purchaseContract/addEdit/:id/:status',
-        Detail: '/contract/purchaseContract/detail/:id/:detailType',
-        Supplemental: '/contract/purchaseContract/supplemental/:id',
-      },
-      IntroductionContract: {
-        Root: '/contract/introductionContract',
-        AddEdit: '/contract/introductionContract/addEdit/:id/:status',
-        Detail: '/contract/introductionContract/detail/:id/:detailType',
-        Supplemental: '/contract/introductionContract/supplemental/:id',
-      },
       AgencyContract: {
-        Root: '/contract/agencyContract',
         AddEdit: '/contract/agencyContract/addEdit/:id/:status',
         Detail: '/contract/agencyContract/detail/:id/:detailType',
-        Supplemental: '/contract/agencyContract/supplemental/:id',
+        Root: '/contract/agencyContract',
+        Supplemental: '/contract/agencyContract/supplemental/:id'
+      },
+      CoProductionContract: {
+        AddEdit: '/contract/coProductionContract/addEdit/:id/:status',
+        Detail: '/contract/coProductionContract/detail/:id/:detailType',
+        Root: '/contract/coProductionContract',
+        Supplemental: '/contract/coProductionContract/supplemental/:id'
+      },
+      CustomizedContract: {
+        AddEdit: '/contract/customizedContract/addEdit/:id/:status',
+        Detail: '/contract/customizedContract/detail/:id/:detailType',
+        Root: '/contract/customizedContract',
+        Supplemental: '/contract/customizedContract/supplemental/:id'
+      },
+      IntroductionContract: {
+        AddEdit: '/contract/introductionContract/addEdit/:id/:status',
+        Detail: '/contract/introductionContract/detail/:id/:detailType',
+        Root: '/contract/introductionContract',
+        Supplemental: '/contract/introductionContract/supplemental/:id'
+      },
+      JointInvestmentContract: {
+        AddEdit: '/contract/jointInvestmentContract/addEdit/:id/:status',
+        Detail: '/contract/jointInvestmentContract/detail/:id/:detailType',
+        Root: '/contract/jointInvestmentContract',
+        Supplemental: '/contract/jointInvestmentContract/supplemental/:id'
       },
       OffsetContract: {
-        Root: '/contract/offsetContract',
         AddEdit: '/contract/offsetContract/addEdit/:id/:status',
         Detail: '/contract/offsetContract/detail/:id/:detailType',
-        Supplemental: '/contract/offsetContract/supplemental/:id',
+        Root: '/contract/offsetContract',
+        Supplemental: '/contract/offsetContract/supplemental/:id'
       },
-    },
+      PurchaseContract: {
+        AddEdit: '/contract/purchaseContract/addEdit/:id/:status',
+        Detail: '/contract/purchaseContract/detail/:id/:detailType',
+        Root: '/contract/purchaseContract',
+        Supplemental: '/contract/purchaseContract/supplemental/:id'
+      }
+    }
+  },
+  Home: {
+    Root: '/home'
   },
   HomemadeDrama: {
-    Root: '/homemadeDrama',
     Management: {
-      Root: '/homemadeDrama/management',
       AddEdit: '/homemadeDrama/management/addEdit/:id/:status',
       Detail: '/homemadeDrama/management/detail/:id/:detailType',
+      Root: '/homemadeDrama/management'
     },
+    Root: '/homemadeDrama'
   },
+  Login: '/login',
+  Root: '/',
+  Work: {
+    Filmography: {
+      AddEdit: '/work/filmography/addEdit/:id',
+      Detail: '/work/filmography/detail/:id',
+      Root: '/work/filmography'
+    },
+    Literature: {
+      AddEdit: '/work/literature/addEdit/:id',
+      Detail: '/work/literature/detail/:id',
+      Root: '/work/literature'
+    },
+    Root: '/work'
+  }
 };

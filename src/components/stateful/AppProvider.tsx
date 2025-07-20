@@ -1,5 +1,5 @@
-import { memo, type ReactNode } from "react";
-import { App } from "antd";
+import { App } from 'antd';
+import { type ReactNode, memo } from 'react';
 
 function ContextHolder() {
   const { message, modal, notification } = App.useApp();
@@ -9,7 +9,7 @@ function ContextHolder() {
   return null;
 }
 
-const AppProvider = memo(({ children }: { children: ReactNode }) => {
+const AppProvider = memo(({ children }: { readonly children: ReactNode }) => {
   return (
     <App className="h-full">
       <ContextHolder />
