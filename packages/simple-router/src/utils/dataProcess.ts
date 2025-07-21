@@ -9,6 +9,10 @@ export function cleanParams(params: Record<string, any> | undefined): Record<str
   return Object.fromEntries(Object.entries(params).filter(([_, value]) => value !== null));
 }
 
+export function transformLocationToFullPath(location: Location) {
+  return location.pathname + location.search + location.hash;
+}
+
 export function transformLocationToRoute(
   location: Location,
   match: AgnosticDataRouteMatch[]

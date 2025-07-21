@@ -1,9 +1,18 @@
-import { stringify } from 'node:querystring';
+import { matchPath } from 'react-router-dom';
+import type { Location } from 'react-router-dom';
 
+import { stringifyQuery } from '../query';
 import type { ElegantConstRoute, RouteLocationNamedRaw } from '../types';
+import { transformLocationToFullPath } from '../utils/dataProcess';
 
 import { createRouteRecordMatcher } from './pathMatcher';
-import { checkChildMissingNameWithEmptyPath, cleanParams, generatePath, normalizeRouteRecord } from './shared';
+import {
+  checkChildMissingNameWithEmptyPath,
+  cleanParams,
+  generatePath,
+  getQueryParams,
+  normalizeRouteRecord
+} from './shared';
 import type { RouteRecordRaw } from './types';
 
 /**
@@ -118,8 +127,8 @@ class CreateRouterMatcher {
    */
   resolve(location: RouteLocationNamedRaw | Location, currentLocation: RouteLocationNamedRaw) {
     let matcher: RouteRecordRaw | undefined;
-    const query: Record<string, string> = {};
-    const path: string = '';
+    let query: Record<string, any> = {};
+    let path: string = '';
     let name: string | undefined;
     let params: Record<string, any> = {};
     let fullPath: string = '';
@@ -135,6 +144,51 @@ class CreateRouterMatcher {
 
       query = location.query || {};
       const queryParams = stringifyQuery(query);
+      fullPath += queryParams ? `?${queryParams}` : '';
+      path = matcher.record.path;
+
+      if (location.hash) {
+        fullPath += location.hash;
+      }
+    } else if (location.pathname) {
+      // 基于 URL 跳转（即 pathname）
+
+      path = this.basename === '/' ? location.pathname : location.pathname.replace(this.basename, '');
+
+      matcher = this.matchers.slice(1).find(m => matchPath(m.record.path, path)) || this.matchers[0];
+
+      query = getQueryParams(location.search);
+
+      if (matcher) {
+        const match = matchPath(matcher.record.path, path);
+        if (match?.params) {
+          params = match.params;
+        }
+        name = matcher.record.name;
+
+        fullPath =
+          this.basename === '/'
+            ? transformLocationToFullPath(location)
+            : transformLocationToFullPath(location).replace(this.basename, '');
+      }
+    } else {
+      // 没有传 name，也没有 pathname，尝试复用当前路由
+      matcher = currentLocation.name
+        ? this.matcherMap.get(currentLocation.name)
+        : this.matchers.find(m => m.record === (currentLocation.path as unknown));
+      if (!matcher) {
+        throw new Error('there is no such route');
+      }
+
+      name = matcher.record.name;
+    }
+
+    const matched = [];
+    let parentMatcher: RouteRecordRaw | undefined = matcher;
+    while (parentMatcher) {
+      // 将父路由的记录添加到匹配数组中
+      matched.unshift(parentMatcher.record);
+      parentMatcher = parentMatcher.parent;
     }
 
     return {
