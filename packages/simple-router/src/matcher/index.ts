@@ -11,6 +11,7 @@ import {
   cleanParams,
   generatePath,
   getQueryParams,
+  mergeMetaFields,
   normalizeRouteRecord
 } from './shared';
 import type { RouteRecordRaw } from './types';
@@ -193,10 +194,15 @@ class CreateRouterMatcher {
 
     return {
       fullPath,
+      hash: location.hash,
+      matched,
+      meta: mergeMetaFields(matched),
       name,
       params,
       path,
-      query
+      query,
+      redirect: matcher.record.redirect,
+      state: location?.state || null
     };
   }
 
@@ -269,7 +275,7 @@ class CreateRouterMatcher {
    *
    * @memberof CreateRouterMatcher
    */
-  resetMatchers() {
+  resetMatcher() {
     this.matchers.length = 0;
     this.matcherMap.clear();
     this.initializeRoutes();

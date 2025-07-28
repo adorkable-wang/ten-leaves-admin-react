@@ -47,7 +47,7 @@ export function createRouter({ getReactRoutes, init, initRoutes, mode, opt }: Ro
 
   const afterGuards = callbacks<AfterEach>();
 
-  const currentRoute = transformLocationToRoute(reactRouter.state.location, reactRouter.state.matches);
+  let currentRoute = transformLocationToRoute(reactRouter.state.location, reactRouter.state.matches);
 
   // reactRouter.getBlocker('beforeGuard', onBeforeRouteChange);
 
@@ -55,17 +55,73 @@ export function createRouter({ getReactRoutes, init, initRoutes, mode, opt }: Ro
 
   // reactRouter.dispose();
 
+  /**
+   * 新增路由或者更新已有路由
+   *
+   * @param {(string | ElegantConstRoute)} parentOrRoute
+   * @param {ElegantConstRoute} [route]
+   */
   const addRoute = (parentOrRoute: string | ElegantConstRoute, route?: ElegantConstRoute) => {
     let parent: Parameters<(typeof matcher)['addRoute']>[1] | undefined;
     let record;
 
     if (typeof parentOrRoute === 'string') {
       parent = matcher.getRecordMatcher(parentOrRoute);
+      if (import.meta.env.MODE === 'development' && !parent) {
+        warn(`添加子路由时未找到父路由${String(parentOrRoute)}`);
+      }
+      record = route!;
+    } else {
+      record = parentOrRoute;
+    }
+
+    matcher.addRoute(record, parent);
+  };
+
+  /**
+   *
+   * 将用户传入的原始 location（路径、查询、参数等）转换成标准格式的路由对象
+   *
+   * @param {(Location | RouteLocationNameRaw)} rawLocation 用户传入的“跳转目标”
+   * @param {RouteLocationNameRaw} [currentLocation]  当前路由
+   */
+  const resolve = (rawLocation: Location | RouteLocationNamedRaw, currentLocation?: RouteLocationNameRaw) => {
+    const current = { ...(currentLocation as RouteLocationNamedRaw) };
+    let matcherLocation: Location | RouteLocationNamedRaw;
+    // 如果是浏览器风格的对象（如 { pathname: '/user/123', search: '?tab=1' }），就直接赋值给 matcherLocation。
+    if ('pathname' in rawLocation) {
+      matcherLocation = rawLocation;
+    } else {
+      // 如果是基于“命名路由”的对象（{ name: 'user', params: { id: 123 } }），就：对 params 和 query 进行 cleanParams 清洗（去除 null / undefined）；
+      // 构造成 matcher 可以识别的格式。
+      matcherLocation = { params: cleanParams(rawLocation.params), query: cleanParams(rawLocation.query), rawLocation };
+    }
+
+    const matchRoute = matcher.resolve(matcherLocation, current);
+
+    return {
+      ...matchRoute,
+      redirectedFrom: currentRoute // 记录跳转前的路由
+    };
+  };
+
+  /**
+   * 路由切换后钩子执行逻辑
+   *
+   * @param {RouterState} state
+   */
+  const afterRouteChange = (state: RouterState) => {
+    // 如果当前状态是空闲状态，则执行 afterGuards 列表中的第一个回调
+    if (state.navigation.state === 'idle') {
+      const from = currentRoute;
+      currentRoute = resolve(state.location);
+      // 调用注册的后置钩子函数，第一个钩子 afterEach(to,from) 的格式
+      afterGuards.list()[0]?.(currentRoute, from);
     }
   };
 
   /**
-   * Adds React routes to the router.
+   * 将 React 路由添加到路由器.
    *
    * @param routes - An array of elegant constant routes.
    */
@@ -100,10 +156,26 @@ export function createRouter({ getReactRoutes, init, initRoutes, mode, opt }: Ro
     reactRouter.patchRoutes(parent, reactRoutes as RouteObject[]);
   };
 
+  const go = (delta: number) => {
+    reactRouter.navigate(delta);
+  };
+
+  const back = () => {
+    go(-1);
+  };
+
+  const forwardRef = () => {
+    go(1);
+  };
+
   const router = {
     addReactRoutes,
     afterEach: afterGuards.add,
-    beforeEach: beforeGuards.add
+    afterRouteChange,
+    back,
+    beforeEach: beforeGuards.add,
+    forwardRef,
+    go
   };
 
   return router;

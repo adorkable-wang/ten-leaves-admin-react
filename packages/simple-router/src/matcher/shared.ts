@@ -97,6 +97,13 @@ export function getQueryParams(search: string): LocationQuery {
   return params;
 }
 
+/**
+ * 合并多个路由记录的 meta 字段
+ *
+ * @export
+ * @param {RouteRecordNormalized[]} matched
+ * @return {*}
+ */
 export function mergeMetaFields(matched: RouteRecordNormalized[]) {
   return matched.reduce((meta, record) => Object.assign(meta, record.meta), {});
 }
