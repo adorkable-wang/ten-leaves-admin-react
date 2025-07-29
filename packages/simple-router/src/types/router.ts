@@ -7,9 +7,13 @@ import type { Route, RouteLocationNormalizedLoaded } from './route';
 
 export type ElegantConstRoute = Omit<RouteObject, 'children' | 'id' | 'path'> & {
   children?: ElegantConstRoute[];
-  matchedFiles: (string | null)[];
+  component?: string;
+  layout?: string;
+  meta?: RouteMeta;
   name: string;
-  path?: string | null;
+  path: string;
+  props?: Record<string, unknown>;
+  redirect?: string;
 };
 
 export interface RouterGuard {
